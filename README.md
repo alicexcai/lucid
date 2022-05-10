@@ -6,7 +6,7 @@ Follow the [pygsheets documentation](https://pygsheets.readthedocs.io/en/stable/
 
 Create a spreadsheet based on [this template](https://docs.google.com/spreadsheets/d/1-_cIxNZ5TfGMpYAyhbvGRaeDj2FD-e8UIDFwUiWszBg/edit?usp=sharing). Make sure to share the sheet with your gservice account.
 
-Add your gservice authorization file to the directory and insert the file path in line 34 of dreams.py:
+Add your gservice authorization file to the directory and insert the file path in line 34 of dream.py:
 ```gc = pygsheets.authorize(service_file='')```
 
 ### Create an Image Database
