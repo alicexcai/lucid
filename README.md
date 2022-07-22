@@ -32,6 +32,9 @@ Edit the permissions bucket policy to the following:
 
 Edit line 137 in dream.py to specify the AWS S3 bucket path in ```base_path = "" + output_bucket```
 
+### Migrate S3 iamge data to Azure 
+
+Follow this [doc](https://docs.microsoft.com/en-us/azure/data-factory/data-migration-guidance-s3-azure-storage?msclkid=e59e8579d07311eca19858bd7fefa676)
 
 ### Create Server
 
@@ -51,7 +54,15 @@ Install [localtunnel](https://github.com/localtunnel/localtunnel) and configure 
 
 Edit line 149 in dream.py to specify the localtunnel endpoint ```url = ''```
 
+### Deploy server into Azure
+
+Follow this [doc](https://docs.microsoft.com/en-us/azure-stack/user/azure-stack-dev-start-howto-vm-python?view=azs-2108)
 
 ### Connect OpenAI
 
 Add your OPENAI_API_KEY to .streamlit/secrets.toml
+
+
+### Start:
+
+OFFICIAL> streamlit run main.py
