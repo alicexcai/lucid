@@ -4,6 +4,7 @@ import pygsheets
 from datetime import datetime
 import openai
 import requests
+import json
 
 def app():
     
@@ -126,25 +127,15 @@ def app():
                 stop=params.stop,
                 )
 
-            imgparams.caption = caption_response['choices'][0]['text']   
+            imgparams.caption = caption_response['choices'][0]['text'][:50]
             completions_data = completions_wks.get_all_records()
             last_row_completions = len(completions_data)+1
             new_completion_data = [datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f"), params.environment, params.event, params.temperature, priming_response['choices'][0]['text'], caption_response['choices'][0]['text'], 'https://lucid.blob.core.windows.net/dreams/' + params.session]
             completions_wks.insert_rows(last_row_completions, number=1, values=new_completion_data)
 
-        def display_images(output_bucket, num_steps):
+        # def display_images(output_bucket, num_steps):
         
-            base_path = "https://lucid.blob.core.windows.net/dreams/" + output_bucket
-            num_images = 130
-
-            initial, mid, final = st.columns(3)
-            initial.image(base_path + f"/progress_30.png")
-            mid.image(base_path + f"/progress_{int(num_images/2)}.png")
-            final.image(base_path + f"/progress_{int(num_images)}.png")
-
-        # def display_images_azure(output_bucket, num_steps):
-        
-        #     base_path = "" + output_bucket
+        #     base_path = "https://lucid.blob.core.windows.net/dreams/" + output_bucket
         #     num_images = 130
 
         #     initial, mid, final = st.columns(3)
@@ -152,23 +143,59 @@ def app():
         #     mid.image(base_path + f"/progress_{int(num_images/2)}.png")
         #     final.image(base_path + f"/progress_{int(num_images)}.png")
 
+        # # def display_images_azure(output_bucket, num_steps):
+        
+        # #     base_path = "" + output_bucket
+        # #     num_images = 130
 
+        # #     initial, mid, final = st.columns(3)
+        # #     initial.image(base_path + f"/progress_30.png")
+        # #     mid.image(base_path + f"/progress_{int(num_images/2)}.png")
+        # #     final.image(base_path + f"/progress_{int(num_images)}.png")
 
-        output_bucket = f"lucid-dream/images/{user}/{params.session}"
-        with st.expander("See Images"):
-            display_images(output_bucket, imgparams.num_steps)
+        # output_bucket = f"lucid-dream/images/{user}/{params.session}"
+        # with st.expander("See Images"):
+        #     display_images(output_bucket, imgparams.num_steps)
 
-        url = 'http://localhost:5000/getImage'
-        request_data = {
-            'clip_input': imgparams.caption.replace(":","").strip(),
-            'folder_name': 'lucid-dream',
-            'room': 'images',
-            'topic': user,
-            'prompt_num': params.session,
-            'clip_guidance_scale': imgparams.clip_guidance_scale,
-            'tv_scale': imgparams.tv_scale,
-            'img_size': imgparams.img_size,
-            'num_steps': imgparams.num_steps,            
+        def display_images(img_urls):
+            
+            for img_url in img_urls:
+                st.write(img_url)
+
+        url = 'https://hf.space/embed/multimodalart/latentdiffusion/+/api/predict/'
+        payload = json.dumps({
+            "data": [
+                imgparams.caption.replace(":","").strip(),
+                30,
+                256,
+                256,
+                3,
+                15
+            ]
+        })
+        headers = {
+            'Content-Type': 'application/json'
         }
+        print("sending request")
+        response = requests.request("POST", url, headers=headers, data=payload)
+        data = response.json()
+        print("received response", data)
+        img_urls = data["data"][1]
+        print("DEBUG img_urls", img_urls)
+        for img_url in img_urls:
+            # print(img_url)
+            st.write("img_url", img_url[0])
+            st.image(img_url[0])
+        # request_data = {
+        #     'clip_input': imgparams.caption.replace(":","").strip(),
+        #     'folder_name': 'lucid-dream',
+        #     'room': 'images',
+        #     'topic': user,
+        #     'prompt_num': params.session,
+        #     'clip_guidance_scale': imgparams.clip_guidance_scale,
+        #     'tv_scale': imgparams.tv_scale,
+        #     'img_size': imgparams.img_size,
+        #     'num_steps': imgparams.num_steps,            
+        # }
 
-        x = requests.post(url, data = request_data)
+        # x = requests.post(url, data = request_data)
